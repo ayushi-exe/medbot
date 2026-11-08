@@ -116,10 +116,9 @@ st.markdown("""
     /* soft gradient background with colored glows */
     .stApp {
         background:
-            radial-gradient(1100px 560px at 8% -8%, rgba(56, 189, 248, 0.22), transparent 60%),
-            radial-gradient(900px 520px at 100% 0%, rgba(167, 139, 250, 0.20), transparent 55%),
-            radial-gradient(800px 500px at 50% 110%, rgba(45, 212, 191, 0.12), transparent 60%),
-            linear-gradient(160deg, #0B1220 0%, #0E1B2E 55%, #0B1220 100%);
+            radial-gradient(1100px 560px at 8% -8%, rgba(110, 135, 185, 0.12), transparent 60%),
+            radial-gradient(900px 520px at 100% 0%, rgba(130, 120, 175, 0.09), transparent 55%),
+            linear-gradient(160deg, #0D1219 0%, #111722 55%, #0D1219 100%);
         background-attachment: fixed;
         color: #E6EDF7;
     }
@@ -136,14 +135,25 @@ st.markdown("""
 
     /* typography */
     .main-title {
-        font-size: 2.9rem; font-weight: 800; line-height: 1.15; margin: 0 0 0.3rem 0;
-        background: linear-gradient(90deg, #7DD3FC, #A78BFA);
+        display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+        margin: 0.2rem 0 0.4rem 0; padding-bottom: 16px; position: relative;
+    }
+    .title-icon { font-size: clamp(3rem, 5.5vw, 4.8rem); line-height: 1; }
+    .title-text {
+        font-size: clamp(2.8rem, 6vw, 5.4rem) !important; font-weight: 800 !important; line-height: 1.1 !important;
+        letter-spacing: -0.02em;
+        background: linear-gradient(90deg, #FFFFFF 0%, #B9CBEE 100%);
         -webkit-background-clip: text; background-clip: text;
         -webkit-text-fill-color: transparent;
+        filter: drop-shadow(0 2px 18px rgba(140, 170, 235, 0.35));
+    }
+    .main-title::after {
+        content: ""; position: absolute; left: 0; bottom: 0; width: 84px; height: 4px;
+        border-radius: 4px; background: linear-gradient(90deg, #9DB7E8, #B8A9E8);
     }
     .sub-title {
-        font-size: 1.15rem; color: rgba(230, 237, 247, 0.74);
-        margin-bottom: 1.2rem; max-width: 60rem; line-height: 1.55;
+        font-size: 1.2rem; color: rgba(230, 237, 247, 0.74);
+        margin: 0.6rem 0 1.2rem 0; max-width: 60rem; line-height: 1.55;
     }
     h2, h3 { letter-spacing: -0.01em; font-weight: 700; }
     h3 { font-size: 1.4rem; margin-top: 1.4rem; }
@@ -455,8 +465,10 @@ with st.sidebar:
     st.session_state["run_verify"] = run_verify
     st.info(T["sidebar_info"])
 
-st.markdown(f'<p class="main-title">🏥 {T["main_title"]}</p>', unsafe_allow_html=True)
-st.markdown(f'<p class="sub-title">{T["subtitle"]}</p>', unsafe_allow_html=True)
+# div (not p) so Streamlit's own paragraph styles cannot override the title styling
+st.markdown(f'<div class="main-title" dir="auto"><span class="title-icon">🏥</span>'
+            f'<span class="title-text">{html.escape(T["main_title"])}</span></div>', unsafe_allow_html=True)
+st.markdown(f'<div class="sub-title" dir="auto">{html.escape(T["subtitle"])}</div>', unsafe_allow_html=True)
 st.warning(T["disclaimer"])
 
 st.markdown(f"**{T['upload_label']}**")
