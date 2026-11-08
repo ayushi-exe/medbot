@@ -606,7 +606,7 @@ if doc is not None:
     with col1:
         # ------- full audio + download
         st.divider()
-        st.subheader(f"🔊 {T['full_audio']}")
+        st.subheader(T["full_audio"])
         # Audio is only generated when the button is pressed, so changing language or level never burns credits.
         audio_key = hashlib.md5(patient["spoken_script"].encode()).hexdigest()
         audio_on = st.session_state.setdefault("audio_on", set())
@@ -624,7 +624,7 @@ if doc is not None:
 
         # ------- voice Q&A: ElevenLabs STT -> Gemini -> ElevenLabs TTS
         st.divider()
-        st.subheader(f"🎤 {T['ask_voice']}")
+        st.subheader(T["ask_voice"])
         st.caption(T["voice_example"])
         if hasattr(st, "audio_input"):
             recording = st.audio_input(T["record_question"])
