@@ -314,8 +314,9 @@ VERIFY_SCHEMA = {
 
 # Cached so changing a widget or pressing play never re-calls the APIs.
 @st.cache_data(show_spinner=False)
-def ui_text(language: str):
-    """Translate every interface label into the chosen language (cached per language)."""
+def ui_text(language: str, strings_json: str):
+    """Translate every interface label into the chosen language (cached per language).
+    strings_json is part of the cache key, so editing UI_STRINGS automatically refreshes old cached labels."""
     if language == "English":
         return UI_STRINGS
     system = (
@@ -457,7 +458,8 @@ def transcribe(audio_bytes: bytes) -> str:
 with st.sidebar:
     target_language = st.selectbox("🌐 Language", LANGUAGES)
     try:
-        T = ui_text(target_language)
+        # fall back to English for any label missing from the translated set
+        T = {**UI_STRINGS, **ui_text(target_language, json.dumps(UI_STRINGS, sort_keys=True))}
     except Exception:
         T = UI_STRINGS  # fall back to English labels if translation fails
     # A translated label changes a widget's identity, which makes Streamlit reset it.
