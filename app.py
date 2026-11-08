@@ -44,10 +44,10 @@ MEAL_CODES = list(MEAL_KEYS)
 
 # Every visible label lives here so Gemini can translate the whole interface.
 UI_STRINGS = {
-    "main_title": "MedBot: Global Post-Op Care",
+    "main_title": "Pill-o-Talk: Global Post-Op Care",
     "subtitle": "Upload a messy discharge paper. Gemini reads it, simplifies it and translates it; "
                 "ElevenLabs speaks it and answers your spoken questions.",
-    "disclaimer": "MedBot is an aid, not a doctor. Always confirm medicines and doses with your doctor or "
+    "disclaimer": "Our MedBot is an aid, not a doctor. Always confirm medicines and doses with your doctor or "
                   "pharmacist. In an emergency, call your local emergency number.",
     "reading_level": "Reading level",
     "level_3": "3rd grade (simplest)",
