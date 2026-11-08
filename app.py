@@ -107,7 +107,7 @@ UI_STRINGS = {
     "speaking": "Speaking...",
 }
 
-st.set_page_config(page_title="PilloTalk", page_icon="💊", layout="wide")
+st.set_page_config(page_title="Pill-o-Talk", page_icon="💊", layout="wide")
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
