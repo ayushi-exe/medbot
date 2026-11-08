@@ -76,7 +76,11 @@ UI_STRINGS = {
     "evening": "Evening",
     "night": "Night",
     "time_not_written": "Time not written (ask your doctor or pharmacist)",
-    "show_extraction": "What Gemini read from the document (English)",
+    "show_extraction": "What MedBot read from your paper (in English)",
+    "field_dose": "Dose",
+    "field_often": "How often (as written)",
+    "field_long": "For how long",
+    "field_notes": "Notes",
     "upload_label": "Upload medical notes (JPG/PNG)",
     "original_document": "Original Document",
     "simplified_instructions": "Simplified Instructions",
@@ -599,8 +603,24 @@ if doc is not None:
         if patient.get("follow_up"):
             st.markdown(f"### 📅 {T['follow_up']}\n{patient['follow_up']}")
 
-        with st.expander(f"🔎 {T['show_extraction']}"):
-            st.json(extraction)
+        with st.expander(T["show_extraction"]):
+            esc = lambda v: html.escape(str(v))
+            clean = lambda v: str(v or "").strip()
+            for med in extraction.get("medications", []):
+                rows = [(T["field_dose"], med.get("dose")), (T["field_often"], med.get("frequency")),
+                        (T["field_long"], med.get("duration")), (T["field_notes"], med.get("notes"))]
+                lines = "".join(f'<div class="med-meta"><b>{esc(k)}:</b> {esc(clean(v))}</div>'
+                                for k, v in rows if clean(v))
+                st.markdown(f'<div class="glass" dir="auto"><div class="med-name">{esc(med.get("name", ""))}</div>'
+                            f'{lines}</div>', unsafe_allow_html=True)
+            for title, items in ((T["wound_care"], extraction.get("wound_care")),
+                                 (T["warning_signs"], extraction.get("warning_signs"))):
+                if items:
+                    st.markdown(f"**{title}**")
+                    for x in items:
+                        st.write(f"- {x}")
+            if clean(extraction.get("follow_up")):
+                st.markdown(f"**{T['follow_up']}**  \n{extraction['follow_up']}")
 
     # ------- audio + voice Q&A now live in the LEFT column, under the document image.
     # Re-entering col1 appends below the image, and by now `patient` / `extraction_json` exist.
