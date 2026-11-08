@@ -1,3 +1,4 @@
+import html
 import io
 import json
 import re
@@ -105,8 +106,108 @@ UI_STRINGS = {
 st.set_page_config(page_title="MedBot", page_icon="🏥", layout="wide")
 st.markdown("""
     <style>
-    .main-title { font-size: 3rem; color: #2E86C1; font-weight: bold; }
-    .sub-title { font-size: 1.2rem; color: #5D6D7E; margin-bottom: 1rem; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Sans+Bengali:wght@400;600;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
+
+    html, body, .stApp, [data-testid="stMarkdownContainer"], button, input, textarea {
+        font-family: 'Inter', 'Noto Sans', 'Noto Sans Devanagari', 'Noto Sans Bengali',
+                     'Noto Sans Arabic', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    }
+
+    /* soft gradient background with colored glows */
+    .stApp {
+        background:
+            radial-gradient(1100px 560px at 8% -8%, rgba(56, 189, 248, 0.22), transparent 60%),
+            radial-gradient(900px 520px at 100% 0%, rgba(167, 139, 250, 0.20), transparent 55%),
+            radial-gradient(800px 500px at 50% 110%, rgba(45, 212, 191, 0.12), transparent 60%),
+            linear-gradient(160deg, #0B1220 0%, #0E1B2E 55%, #0B1220 100%);
+        background-attachment: fixed;
+        color: #E6EDF7;
+    }
+    [data-testid="stHeader"] { background: transparent; }
+    .block-container { padding-top: 2.2rem; max-width: 1200px; }
+
+    /* sidebar as frosted glass */
+    section[data-testid="stSidebar"] {
+        background: rgba(255, 255, 255, 0.04);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    /* typography */
+    .main-title {
+        font-size: 2.9rem; font-weight: 800; line-height: 1.15; margin: 0 0 0.3rem 0;
+        background: linear-gradient(90deg, #7DD3FC, #A78BFA);
+        -webkit-background-clip: text; background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .sub-title {
+        font-size: 1.15rem; color: rgba(230, 237, 247, 0.74);
+        margin-bottom: 1.2rem; max-width: 60rem; line-height: 1.55;
+    }
+    h2, h3 { letter-spacing: -0.01em; font-weight: 700; }
+    h3 { font-size: 1.4rem; margin-top: 1.4rem; }
+    p, li, label { font-size: 1.05rem; line-height: 1.6; }
+    hr { border-color: rgba(255, 255, 255, 0.10); }
+
+    /* glass cards */
+    .glass {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.13);
+        border-radius: 16px;
+        padding: 14px 18px;
+        margin: 12px 0 6px 0;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+        box-shadow: 0 8px 28px rgba(0, 0, 0, 0.28);
+    }
+    .med-name { font-size: 1.25rem; font-weight: 700; }
+    .med-dose { color: #7DD3FC; font-weight: 600; margin-bottom: 8px; }
+    .med-time { font-size: 1.08rem; font-weight: 600; margin-bottom: 4px; }
+    .med-meta, .med-tip { color: rgba(230, 237, 247, 0.82); font-size: 1rem; }
+
+    /* daily schedule pills */
+    .slot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0; }
+    .slot-label { font-weight: 700; min-width: 8.5rem; }
+    .pill {
+        background: rgba(125, 211, 252, 0.14);
+        border: 1px solid rgba(125, 211, 252, 0.35);
+        padding: 4px 12px; border-radius: 999px; font-size: 0.98rem; font-weight: 600;
+    }
+
+    /* alerts, expanders, buttons, upload box */
+    [data-testid="stAlert"] {
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    [data-testid="stExpander"] details {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 14px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+    }
+    .stButton > button, .stDownloadButton > button {
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.07);
+        backdrop-filter: blur(8px);
+        font-weight: 600;
+        transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+    .stButton > button:hover, .stDownloadButton > button:hover {
+        border-color: #7DD3FC; background: rgba(125, 211, 252, 0.14); transform: translateY(-1px);
+    }
+    [data-testid="stFileUploaderDropzone"] {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1.5px dashed rgba(125, 211, 252, 0.5);
+        border-radius: 16px;
+    }
+    [data-testid="stImage"] img {
+        border-radius: 14px; box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -447,17 +548,24 @@ if doc is not None:
         for slot, names in slots.items():
             if names:
                 label = T["time_not_written"] if slot == "none" else f"{TIME_ICONS[slot]} {T[slot]}"
-                st.write(f"**{label}:** " + ", ".join(names))
+                pills = "".join(f'<span class="pill">{html.escape(n)}</span>' for n in names)
+                st.markdown(f'<div class="slot" dir="auto"><span class="slot-label">{html.escape(label)}</span>'
+                            f'{pills}</div>', unsafe_allow_html=True)
 
         if patient["medications"]:
             st.markdown(f"### 💊 {T['medicines']}")
         for i, med in enumerate(patient["medications"]):
-            with st.container(border=True):
-                st.markdown(f"**{med['name']}** — {med['dose']}")
+            with st.container():
                 icons = " ".join(TIME_ICONS.get(t.lower(), "") for t in med.get("times", []))
-                st.write(f"{icons} {med['time_of_day']}".strip())
-                st.write(f"🕐 {med['schedule']}")
-                st.write(med["how_to_take"])
+                esc = lambda s: html.escape(str(s))
+                st.markdown(
+                    f'<div class="glass" dir="auto">'
+                    f'<div class="med-name">{esc(med["name"])}</div>'
+                    f'<div class="med-dose">{esc(med["dose"])}</div>'
+                    f'<div class="med-time">{icons} {esc(med["time_of_day"])}</div>'
+                    f'<div class="med-meta">🕐 {esc(med["schedule"])}</div>'
+                    f'<div class="med-tip">{esc(med["how_to_take"])}</div>'
+                    f'</div>', unsafe_allow_html=True)
                 if st.button(f"🔊 {T['listen']}", key=f"med_{i}"):
                     try:
                         spoken_name = re.sub(r"\s*\(.*?\)", "", med["name"])  # drop the Latin original for audio
