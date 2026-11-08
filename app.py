@@ -135,11 +135,12 @@ st.markdown("""
 
     /* typography */
     .main-title {
-        display: block; margin: 0.2rem 0 0.4rem 0; padding-bottom: 16px; position: relative;
+        display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+        margin: 0.2rem 0 0.4rem 0; padding-bottom: 16px; position: relative;
     }
+    .title-icon { font-size: clamp(3rem, 5.5vw, 4.8rem); line-height: 1; }
     .title-text {
-        display: inline-block; white-space: nowrap;
-        font-size: clamp(1.4rem, 4.2vw, 3.4rem) !important; font-weight: 800 !important; line-height: 1.1 !important;
+        font-size: clamp(2.8rem, 6vw, 5.4rem) !important; font-weight: 800 !important; line-height: 1.1 !important;
         letter-spacing: -0.02em;
         background: linear-gradient(90deg, #FFFFFF 0%, #B9CBEE 100%);
         -webkit-background-clip: text; background-clip: text;
@@ -465,7 +466,7 @@ with st.sidebar:
     st.info(T["sidebar_info"])
 
 # div (not p) so Streamlit's own paragraph styles cannot override the title styling
-st.markdown(f'<div class="main-title" dir="auto">'
+st.markdown(f'<div class="main-title" dir="auto"><span class="title-icon">🏥</span>'
             f'<span class="title-text">{html.escape(T["main_title"])}</span></div>', unsafe_allow_html=True)
 st.markdown(f'<div class="sub-title" dir="auto">{html.escape(T["subtitle"])}</div>', unsafe_allow_html=True)
 st.warning(T["disclaimer"])
@@ -600,49 +601,52 @@ if doc is not None:
         with st.expander(f"🔎 {T['show_extraction']}"):
             st.json(extraction)
 
-    # ------- full audio + download
-    st.divider()
-    st.subheader(f"🔊 {T['full_audio']}")
-    # Audio is only generated when the button is pressed, so changing language or level never burns credits.
-    audio_key = hashlib.md5(patient["spoken_script"].encode()).hexdigest()
-    audio_on = st.session_state.setdefault("audio_on", set())
-    if st.button(f"▶️ {T['generate_audio']}"):
-        audio_on.add(audio_key)
-    if audio_key in audio_on:
-        try:
-            with st.spinner(f"🎙️ {T['audio_spinner']}"):
-                full_audio = tts(patient["spoken_script"])
-            st.audio(full_audio, format="audio/mp3")
-            st.download_button(f"⬇️ {T['download_mp3']}", full_audio,
-                               file_name=f"instructions_{target_language}.mp3", mime="audio/mpeg")
-        except Exception as e:
-            st.error(f"Audio generation error: {e}")
+    # ------- audio + voice Q&A now live in the LEFT column, under the document image.
+    # Re-entering col1 appends below the image, and by now `patient` / `extraction_json` exist.
+    with col1:
+        # ------- full audio + download
+        st.divider()
+        st.subheader(f"🔊 {T['full_audio']}")
+        # Audio is only generated when the button is pressed, so changing language or level never burns credits.
+        audio_key = hashlib.md5(patient["spoken_script"].encode()).hexdigest()
+        audio_on = st.session_state.setdefault("audio_on", set())
+        if st.button(f"▶️ {T['generate_audio']}"):
+            audio_on.add(audio_key)
+        if audio_key in audio_on:
+            try:
+                with st.spinner(f"🎙️ {T['audio_spinner']}"):
+                    full_audio = tts(patient["spoken_script"])
+                st.audio(full_audio, format="audio/mp3")
+                st.download_button(f"⬇️ {T['download_mp3']}", full_audio,
+                                   file_name=f"instructions_{target_language}.mp3", mime="audio/mpeg")
+            except Exception as e:
+                st.error(f"Audio generation error: {e}")
 
-    # ------- voice Q&A: ElevenLabs STT -> Gemini -> ElevenLabs TTS
-    st.divider()
-    st.subheader(f"🎤 {T['ask_voice']}")
-    st.caption(T["voice_example"])
-    if hasattr(st, "audio_input"):
-        recording = st.audio_input(T["record_question"])
-        if recording is not None:
-            audio_bytes = recording.getvalue()
-            qa_key = hashlib.md5(audio_bytes).hexdigest() + target_language
-            qa_cache = st.session_state.setdefault("qa", {})
-            if qa_key not in qa_cache:
-                try:
-                    with st.spinner(f"👂 {T['listening']}"):
-                        question = transcribe(audio_bytes)
-                    with st.spinner(f"🧠 {T['thinking']}"):
-                        answer = answer_question(question, extraction_json, target_language)
-                    with st.spinner(f"🎙️ {T['speaking']}"):
-                        answer_audio = tts(answer)
-                    qa_cache[qa_key] = (question, answer, answer_audio)
-                except Exception as e:
-                    st.error(f"Voice Q&A error: {e}")
-            if qa_key in qa_cache:
-                question, answer, answer_audio = qa_cache[qa_key]
-                st.write(f"**{T['you_asked']}** {question}")
-                st.info(answer)
-                st.audio(answer_audio, format="audio/mp3")
-    else:
-        st.info("Voice questions need a newer Streamlit. Run: pip install --upgrade streamlit")
+        # ------- voice Q&A: ElevenLabs STT -> Gemini -> ElevenLabs TTS
+        st.divider()
+        st.subheader(f"🎤 {T['ask_voice']}")
+        st.caption(T["voice_example"])
+        if hasattr(st, "audio_input"):
+            recording = st.audio_input(T["record_question"])
+            if recording is not None:
+                audio_bytes = recording.getvalue()
+                qa_key = hashlib.md5(audio_bytes).hexdigest() + target_language
+                qa_cache = st.session_state.setdefault("qa", {})
+                if qa_key not in qa_cache:
+                    try:
+                        with st.spinner(f"👂 {T['listening']}"):
+                            question = transcribe(audio_bytes)
+                        with st.spinner(f"🧠 {T['thinking']}"):
+                            answer = answer_question(question, extraction_json, target_language)
+                        with st.spinner(f"🎙️ {T['speaking']}"):
+                            answer_audio = tts(answer)
+                        qa_cache[qa_key] = (question, answer, answer_audio)
+                    except Exception as e:
+                        st.error(f"Voice Q&A error: {e}")
+                if qa_key in qa_cache:
+                    question, answer, answer_audio = qa_cache[qa_key]
+                    st.write(f"**{T['you_asked']}** {question}")
+                    st.info(answer)
+                    st.audio(answer_audio, format="audio/mp3")
+        else:
+            st.info("Voice questions need a newer Streamlit. Run: pip install --upgrade streamlit")
