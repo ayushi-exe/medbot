@@ -140,7 +140,8 @@ st.markdown("""
     }
     .title-icon { font-size: clamp(3rem, 5.5vw, 4.8rem); line-height: 1; }
     .title-text {
-        font-size: clamp(2.8rem, 6vw, 5.4rem) !important; font-weight: 800 !important; line-height: 1.1 !important;
+        font-size: clamp(1.3rem, 4.2vw, 3rem) !important; font-weight: 800 !important; line-height: 1.1 !important;
+        white-space: nowrap;
         letter-spacing: -0.02em;
         background: linear-gradient(90deg, #FFFFFF 0%, #B9CBEE 100%);
         -webkit-background-clip: text; background-clip: text;
@@ -466,7 +467,7 @@ with st.sidebar:
     st.info(T["sidebar_info"])
 
 # div (not p) so Streamlit's own paragraph styles cannot override the title styling
-st.markdown(f'<div class="main-title" dir="auto"><span class="title-icon">🏥</span>'
+st.markdown(f'<div class="main-title" dir="auto">'
             f'<span class="title-text">{html.escape(T["main_title"])}</span></div>', unsafe_allow_html=True)
 st.markdown(f'<div class="sub-title" dir="auto">{html.escape(T["subtitle"])}</div>', unsafe_allow_html=True)
 st.warning(T["disclaimer"])
